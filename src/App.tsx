@@ -91,22 +91,26 @@ function HeroStage() {
           </a>
         </div>
 
-        <div className="flex items-center justify-center gap-2 text-center">
-          <picture className="shrink-0">
-            <source srcSet={soupWebp} type="image/webp" />
-            <img
-              src={soupPng}
-              alt=""
-              aria-hidden="true"
-              width={1024}
-              height={682}
-              decoding="async"
-              draggable={false}
-              className="h-4 w-auto select-none opacity-80 sm:h-[18px]"
-            />
-          </picture>
-          <p className="text-xs tracking-[0.04em] text-[#666] select-none">
-            &copy; {new Date().getFullYear()} {siteConfig.brandName}. Todos os direitos reservados.
+        <div className="flex items-center justify-center text-center">
+          <p className="inline-flex flex-wrap items-center justify-center gap-x-1.5 text-xs tracking-[0.04em] text-[#666] select-none">
+            <span>&copy; {new Date().getFullYear()}</span>
+            <span className="inline-flex items-center gap-1.5">
+              <picture className="inline-flex shrink-0 items-center">
+                <source srcSet={soupWebp} type="image/webp" />
+                <img
+                  src={soupPng}
+                  alt=""
+                  aria-hidden="true"
+                  width={1024}
+                  height={682}
+                  decoding="async"
+                  draggable={false}
+                  className="h-3.5 w-auto select-none opacity-85 sm:h-4"
+                />
+              </picture>
+              <span>{siteConfig.brandName}.</span>
+            </span>
+            <span>Todos os direitos reservados.</span>
           </p>
         </div>
 

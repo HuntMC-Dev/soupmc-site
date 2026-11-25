@@ -1,50 +1,87 @@
-import { useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useRef } from 'react'
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from 'motion/react'
 
 const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
 const PREFIX_CHARS = ['S', 'o', 'u', 'p'] as const
 
-function getWaveStyle(idx: number, hoveredIdx: number | null): React.CSSProperties {
-  if (hoveredIdx === null) {
-    return { transform: 'translate3d(0, 0, 0) scale(1)' }
-  }
-  const dist = Math.abs(idx - hoveredIdx)
-  if (dist === 0) {
-    return { transform: 'translate3d(0, -5px, 0) scale(1.14)' }
-  }
-  if (dist === 1) {
-    return { transform: 'translate3d(0, -2.5px, 0) scale(1.07)' }
-  }
-  if (dist === 2) {
-    return { transform: 'translate3d(0, -1px, 0) scale(1.025)' }
-  }
-  return { transform: 'translate3d(0, 0, 0) scale(1)' }
+const SPRING_WAVE = {
+  mass: 0.12,
+  stiffness: 280,
+  damping: 20,
+}
+
+const WAVE_RADIUS = 135
+
+function useDockWave(
+  ref: React.RefObject<HTMLSpanElement | null>,
+  mouseX: MotionValue<number>,
+  disabled: boolean,
+) {
+  const influence = useTransform(mouseX, (x) => {
+    if (disabled || !Number.isFinite(x) || !ref.current) return 0
+    const rect = ref.current.getBoundingClientRect()
+    const center = rect.left + rect.width / 2
+    const dist = Math.abs(x - center)
+    if (dist >= WAVE_RADIUS) return 0
+    // Smooth cosine bell curve: 1 at center, 0 at WAVE_RADIUS, C1-smooth everywhere
+    return 0.5 * (1 + Math.cos((Math.PI * dist) / WAVE_RADIUS))
+  })
+
+  const rawScale = useTransform(influence, (t) => 1 + t * 0.16)
+  const rawY = useTransform(influence, (t) => -t * 6.5)
+
+  const scale = useSpring(rawScale, SPRING_WAVE)
+  const y = useSpring(rawY, SPRING_WAVE)
+
+  return { scale, y }
+}
+
+interface WaveCharProps {
+  char: string
+  mouseX: MotionValue<number>
+}
+
+function WaveChar({ char, mouseX }: WaveCharProps) {
+  const shouldReduceMotion = useReducedMotion()
+  const ref = useRef<HTMLSpanElement>(null)
+  const { scale, y } = useDockWave(ref, mouseX, Boolean(shouldReduceMotion))
+
+  return (
+    <span ref={ref} className="inline-block cursor-pointer">
+      <motion.span
+        style={shouldReduceMotion ? undefined : { scale, y }}
+        className="wordmark-char wordmark-char-base inline-block text-[#fafafa]"
+      >
+        {char}
+      </motion.span>
+    </span>
+  )
 }
 
 interface FlipCharSlotProps {
-  index: number
-  hoveredIdx: number | null
-  onHover: (idx: number | null) => void
+  mouseX: MotionValue<number>
   from: string
   to: string
   flipped: boolean
 }
 
-function FlipCharSlot({
-  index,
-  hoveredIdx,
-  onHover,
-  from,
-  to,
-  flipped,
-}: FlipCharSlotProps) {
+function FlipCharSlot({ mouseX, from, to, flipped }: FlipCharSlotProps) {
   const shouldReduceMotion = useReducedMotion()
+  const ref = useRef<HTMLSpanElement>(null)
+  const { scale, y } = useDockWave(ref, mouseX, Boolean(shouldReduceMotion))
   const activeChar = flipped ? to : from
-  const isNear = hoveredIdx !== null && Math.abs(index - hoveredIdx) <= 1
 
   return (
     <span
-      onPointerEnter={() => !shouldReduceMotion && onHover(index)}
+      ref={ref}
       className="relative inline-grid cursor-pointer place-items-center"
       style={{ perspective: 420 }}
     >
@@ -62,11 +99,9 @@ function FlipCharSlot({
         {to}
       </span>
 
-      <span
-        className={`wordmark-char wordmark-char-accent col-start-1 row-start-1 inline-flex items-center justify-center ${
-          isNear ? 'wordmark-char-accent-lit' : ''
-        }`}
-        style={shouldReduceMotion ? undefined : getWaveStyle(index, hoveredIdx)}
+      <motion.span
+        style={shouldReduceMotion ? undefined : { scale, y }}
+        className="wordmark-char wordmark-char-accent col-start-1 row-start-1 inline-flex items-center justify-center"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
@@ -95,7 +130,7 @@ function FlipCharSlot({
             {activeChar}
           </motion.span>
         </AnimatePresence>
-      </span>
+      </motion.span>
     </span>
   )
 }
@@ -110,7 +145,7 @@ export function BrandWordmark({
   secondFlipped,
 }: BrandWordmarkProps) {
   const shouldReduceMotion = useReducedMotion()
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+  const mouseX = useMotionValue(Number.POSITIVE_INFINITY)
 
   return (
     <motion.h1
@@ -121,41 +156,20 @@ export function BrandWordmark({
           ? { duration: 0.25 }
           : { duration: 0.8, delay: 0.95, ease: EASE_CINEMATIC }
       }
-      onPointerLeave={() => setHoveredIdx(null)}
+      onPointerMove={(e) => {
+        if (e.pointerType === 'mouse' && !shouldReduceMotion) {
+          mouseX.set(e.clientX)
+        }
+      }}
+      onPointerLeave={() => mouseX.set(Number.POSITIVE_INFINITY)}
       aria-label="SoupMC"
-      className="font-display mt-6 flex items-baseline justify-center text-[clamp(2.85rem,11vw,3.75rem)] leading-[1.08] font-bold tracking-[-0.02em] whitespace-nowrap select-none sm:mt-7 sm:text-[4.5rem] lg:text-[5.25rem]"
+      className="font-display mt-6 flex items-baseline justify-center px-4 text-[clamp(2.85rem,11vw,3.75rem)] leading-[1.08] font-bold tracking-[-0.02em] whitespace-nowrap select-none sm:mt-7 sm:text-[4.5rem] lg:text-[5.25rem]"
     >
-      {PREFIX_CHARS.map((ch, idx) => {
-        const isNear = hoveredIdx !== null && Math.abs(idx - hoveredIdx) <= 1
-        return (
-          <span
-            key={`${ch}-${idx}`}
-            onPointerEnter={() => !shouldReduceMotion && setHoveredIdx(idx)}
-            className={`wordmark-char wordmark-char-base text-[#fafafa] ${
-              isNear ? 'wordmark-char-base-lit' : ''
-            }`}
-            style={shouldReduceMotion ? undefined : getWaveStyle(idx, hoveredIdx)}
-          >
-            {ch}
-          </span>
-        )
-      })}
-      <FlipCharSlot
-        index={4}
-        hoveredIdx={hoveredIdx}
-        onHover={setHoveredIdx}
-        from="H"
-        to="M"
-        flipped={firstFlipped}
-      />
-      <FlipCharSlot
-        index={5}
-        hoveredIdx={hoveredIdx}
-        onHover={setHoveredIdx}
-        from="G"
-        to="C"
-        flipped={secondFlipped}
-      />
+      {PREFIX_CHARS.map((ch, idx) => (
+        <WaveChar key={`${ch}-${idx}`} char={ch} mouseX={mouseX} />
+      ))}
+      <FlipCharSlot mouseX={mouseX} from="H" to="M" flipped={firstFlipped} />
+      <FlipCharSlot mouseX={mouseX} from="G" to="C" flipped={secondFlipped} />
     </motion.h1>
   )
 }
