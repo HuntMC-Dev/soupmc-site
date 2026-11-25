@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root {
+  --bg-canvas: #090707;
+  --bg-elevated: #120e0d;
+  --bg-aura-amber: rgba(244, 169, 59, 0.14);
+  --bg-aura-rose: rgba(229, 162, 157, 0.08);
+  --text-primary: #fdf6f0;
+  --text-secondary: #b8a89e;
+  --text-muted: #7a6b63;
+  --accent-amber: #f4a93b;
+  --accent-amber-deep: #c87624;
+  --accent-rose: #e5a29d;
+  --border-subtle: rgba(253, 246, 240, 0.08);
+  --border-hover: rgba(244, 169, 59, 0.3);
+  --glass-bg: rgba(24, 18, 16, 0.58);
+  --soup-float-y: -8px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --soup-float-y: -10px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --soup-float-y: -12px;
+  }
+}
+
+html,
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  min-height: 100%;
+}
+
+/* Zero-flicker GPU-composited floating soup animation */
+@keyframes soup-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, var(--soup-float-y), 0);
+  }
+}
+
+@keyframes soup-shadow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    opacity: 0.62;
+  }
+  50% {
+    transform: translate3d(0, 0, 0) scale3d(0.84, 0.84, 1);
+    opacity: 0.32;
+  }
+}
+
+@keyframes aura-breathe {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1.045, 1.045, 1);
+  }
+}
+
+@keyframes status-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  75%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes mc-sheen {
+  0% {
+    background-position: -140% 0;
+  }
+  100% {
+    background-position: 220% 0;
+  }
+}
+
+.soup-float-layer {
+  animation: soup-float 5.2s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.soup-shadow-layer {
+  animation: soup-shadow 5.2s ease-in-out infinite;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.aura-breathe {
+  animation: aura-breathe 8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.status-pulse-ring {
+  animation: status-pulse-ring 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.mc-sheen-text {
+  background-image: linear-gradient(
+    110deg,
+    #f4a93b 0%,
+    #f2b25c 35%,
+    #fff4df 48%,
+    #e5a29d 62%,
+    #f4a93b 100%
+  );
+  background-size: 240% 100%;
+  background-position: 220% 0;
+  animation: mc-sheen 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s 1 both;
+}
+
+.bg-dot-grid {
+  background-image: radial-gradient(
+    rgba(253, 246, 240, 0.045) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  mask-image: radial-gradient(
+    ellipse 68% 62% at 50% 44%,
+    black 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 68% 62% at 50% 44%,
+    black 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    transparent 100%
+  );
+}
+
+.pointer-spotlight {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pointer-spotlight {
+    display: block;
+    background: radial-gradient(
+      480px circle at var(--mx, 50%) var(--my, 38%),
+      rgba(244, 169, 59, 0.075),
+      rgba(229, 162, 157, 0.025) 42%,
+      transparent 72%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soup-float-layer,
+  .soup-shadow-layer,
+  .aura-breathe,
+  .status-pulse-ring,
+  .mc-sheen-text {
+    animation: none !important;
+  }
+
+  .pointer-spotlight {
+    display: none !important;
+  }
+}
