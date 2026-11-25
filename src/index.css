@@ -88,23 +88,92 @@ body {
   color: transparent;
 }
 
-/* Per-character hover interaction on desktop (inspired by playhytalegames) */
+/* Per-character dock wave hover + layered depth shadows */
 .wordmark-char {
   display: inline-block;
-  transition: transform 0.25s ease, text-shadow 0.25s ease, filter 0.25s ease;
-  cursor: default;
+  cursor: pointer;
+  will-change: transform;
+  backface-visibility: hidden;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    text-shadow 0.22s ease,
+    filter 0.22s ease;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .wordmark-char:hover {
-    transform: translateY(-3px) scale(1.08);
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.42);
-  }
+.wordmark-char-base {
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.78),
+    0 6px 14px rgba(0, 0, 0, 0.85),
+    0 14px 28px rgba(0, 0, 0, 0.65);
+}
 
-  .wordmark-char-accent:hover {
-    transform: translateY(-3px) scale(1.08);
-    filter: drop-shadow(0 0 18px rgba(240, 176, 0, 0.45));
+.wordmark-char-base-lit {
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.78),
+    0 6px 14px rgba(0, 0, 0, 0.85),
+    0 0 22px rgba(255, 255, 255, 0.42);
+}
+
+.wordmark-char-accent {
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.75))
+    drop-shadow(0 8px 16px rgba(0, 0, 0, 0.8));
+}
+
+.wordmark-char-accent-lit {
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.75))
+    drop-shadow(0 0 20px rgba(240, 176, 0, 0.52));
+}
+
+/* Periodic subtle attention animation on "verdadeiro" */
+@keyframes verdadeiro-pulse {
+  0%,
+  74%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    text-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.75),
+      0 6px 16px rgba(0, 0, 0, 0.85);
   }
+  83% {
+    transform: translate3d(0, -2px, 0) scale(1.045);
+    text-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.75),
+      0 0 18px rgba(240, 176, 0, 0.45),
+      0 0 32px rgba(224, 64, 26, 0.22);
+  }
+  92% {
+    transform: translate3d(0, 0, 0) scale(1);
+    text-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.75),
+      0 6px 16px rgba(0, 0, 0, 0.85);
+  }
+}
+
+@keyframes verdadeiro-line-glow {
+  0%,
+  74%,
+  100% {
+    box-shadow: 0 0 10px rgba(240, 176, 0, 0.35);
+    filter: brightness(1);
+  }
+  83% {
+    box-shadow:
+      0 0 18px rgba(240, 176, 0, 0.75),
+      0 0 28px rgba(224, 64, 26, 0.4);
+    filter: brightness(1.25);
+  }
+  92% {
+    box-shadow: 0 0 10px rgba(240, 176, 0, 0.35);
+    filter: brightness(1);
+  }
+}
+
+.verdadeiro-highlight {
+  will-change: transform;
+  animation: verdadeiro-pulse 5.6s ease-in-out 1.4s infinite;
+}
+
+.verdadeiro-underline {
+  animation: verdadeiro-line-glow 5.6s ease-in-out 1.4s infinite;
 }
 
 /* Architectural hairline corner brackets (desktop) */
@@ -161,10 +230,54 @@ body {
   height: 1px;
 }
 
+/* Subtle masked diagonal specular light sweep across the floating soup */
+@keyframes soup-sheen {
+  0%,
+  66% {
+    transform: translate3d(-150%, 0, 0) skewX(-24deg);
+    opacity: 0;
+  }
+  72% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0.9;
+  }
+  94%,
+  100% {
+    transform: translate3d(250%, 0, 0) skewX(-24deg);
+    opacity: 0;
+  }
+}
+
+.soup-sheen-sweep {
+  position: absolute;
+  inset: -15% 0;
+  width: 46%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 240, 200, 0.08) 28%,
+    rgba(255, 245, 220, 0.32) 50%,
+    rgba(255, 240, 200, 0.08) 72%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  animation: soup-sheen 6.4s cubic-bezier(0.35, 0, 0.25, 1) 1.6s infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .soup-float-layer,
-  .soup-shadow-layer {
+  .soup-shadow-layer,
+  .soup-sheen-sweep,
+  .verdadeiro-highlight,
+  .verdadeiro-underline {
     animation: none !important;
+  }
+
+  .soup-sheen-sweep {
+    display: none;
   }
 
   .wordmark-char,

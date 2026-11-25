@@ -9,6 +9,8 @@ import { DiscordCta } from './components/DiscordCta'
 import { siteConfig } from './config/site'
 import huntmcLogoPng from './assets/huntmc-logo.png'
 import huntmcLogoWebp from './assets/huntmc-logo.webp'
+import soupPng from './assets/soup.png'
+import soupWebp from './assets/soup.webp'
 
 function HeroStage() {
   const shouldReduceMotion = useReducedMotion()
@@ -65,31 +67,50 @@ function HeroStage() {
         <DiscordCta />
       </main>
 
-      <footer className="relative z-10 flex w-full items-center justify-between px-6 pb-6 sm:px-10">
-        <a
-          href="https://hunt-mc.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex cursor-pointer items-center gap-2.5 text-xs tracking-[0.06em] text-[#888] transition-colors duration-200 hover:text-[#fafafa] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f0b000]"
-        >
-          <picture>
-            <source srcSet={huntmcLogoWebp} type="image/webp" />
+      <footer className="relative z-10 grid w-full grid-cols-1 items-center gap-3 px-6 pb-6 sm:grid-cols-3 sm:px-10">
+        <div className="flex justify-center sm:justify-start">
+          <a
+            href="https://hunt-mc.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex origin-left cursor-pointer items-center gap-2.5 text-xs tracking-[0.06em] text-[#888] will-change-transform [backface-visibility:hidden] [transform:translateZ(0)] transition-[transform,color] duration-200 ease-out hover:[transform:translateZ(0)_scale(1.05)] hover:text-[#fafafa] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f0b000]"
+          >
+            <picture>
+              <source srcSet={huntmcLogoWebp} type="image/webp" />
+              <img
+                src={huntmcLogoPng}
+                alt="HuntMC"
+                width={89}
+                height={96}
+                decoding="async"
+                draggable={false}
+                className="h-5 w-auto select-none opacity-85 transition-[transform,opacity,filter] duration-200 ease-out group-hover:scale-110 group-hover:opacity-100 group-hover:brightness-125 sm:h-6"
+              />
+            </picture>
+            <span>Powered by HuntMC</span>
+          </a>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 text-center">
+          <picture className="shrink-0">
+            <source srcSet={soupWebp} type="image/webp" />
             <img
-              src={huntmcLogoPng}
-              alt="HuntMC"
-              width={89}
-              height={96}
+              src={soupPng}
+              alt=""
+              aria-hidden="true"
+              width={1024}
+              height={682}
               decoding="async"
               draggable={false}
-              className="h-5 w-auto select-none sm:h-6"
+              className="h-4 w-auto select-none opacity-80 sm:h-[18px]"
             />
           </picture>
-          <span>Powered by HuntMC</span>
-        </a>
+          <p className="text-xs tracking-[0.04em] text-[#666] select-none">
+            &copy; {new Date().getFullYear()} {siteConfig.brandName}. Todos os direitos reservados.
+          </p>
+        </div>
 
-        <p className="font-mono text-xs tracking-[0.08em] text-[#555] select-none">
-          &copy; {siteConfig.brandName}
-        </p>
+        <div className="hidden sm:block" aria-hidden="true" />
       </footer>
     </div>
   )

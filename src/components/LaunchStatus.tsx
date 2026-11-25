@@ -59,12 +59,8 @@ export function LaunchStatus() {
     <motion.div
       role="status"
       aria-live="polite"
-      initial={
-        shouldReduceMotion
-          ? { opacity: 0 }
-          : { y: 14, opacity: 0, filter: 'blur(6px)' }
-      }
-      animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+      initial={shouldReduceMotion ? { opacity: 0 } : { y: 14, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
       transition={
         shouldReduceMotion
           ? { duration: 0.25 }
@@ -73,7 +69,7 @@ export function LaunchStatus() {
       className="mt-8 flex items-center justify-center text-center sm:mt-10"
     >
       {isValidCountdown ? (
-        <p className="font-mono text-[clamp(1.5rem,4.8vw,2.4rem)] font-bold tracking-[0.16em] text-[#fafafa] uppercase tabular-nums [text-shadow:0_0_32px_rgba(240,176,0,0.2)]">
+        <p className="font-mono text-[clamp(1.5rem,4.8vw,2.4rem)] font-bold tracking-[0.16em] text-[#fafafa] uppercase tabular-nums [text-shadow:0_2px_0_rgba(0,0,0,0.75),0_6px_18px_rgba(0,0,0,0.9),0_0_28px_rgba(240,176,0,0.2)]">
           {countdown.completed ? (
             'DISPONÍVEL AGORA'
           ) : (
@@ -89,7 +85,7 @@ export function LaunchStatus() {
           )}
         </p>
       ) : (
-        <p className="font-display pl-[0.24em] text-[clamp(1.65rem,5vw,2.6rem)] font-bold tracking-[0.24em] text-[#fafafa] uppercase [text-shadow:0_0_32px_rgba(240,176,0,0.22)]">
+        <p className="font-display pl-[0.24em] text-[clamp(1.65rem,5vw,2.6rem)] font-bold tracking-[0.24em] text-[#fafafa] uppercase [text-shadow:0_2px_0_rgba(0,0,0,0.75),0_6px_18px_rgba(0,0,0,0.9),0_0_28px_rgba(240,176,0,0.22)]">
           {label}
         </p>
       )}

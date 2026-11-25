@@ -18,14 +18,10 @@ export function FloatingSoup() {
     <div className="relative flex flex-col items-center justify-center">
       {/* Fixed-height stage container -> CLS = 0 */}
       <div className="relative flex h-[132px] w-[176px] items-center justify-center sm:h-[162px] sm:w-[220px] lg:h-[184px] lg:w-[248px]">
-        {/* Layer 1: Smooth blur-fade entrance (0.00s - 0.90s) */}
+        {/* Layer 1: Smooth entrance (0.00s - 0.90s, no persistent filter layer) */}
         <motion.div
-          initial={
-            shouldReduceMotion
-              ? { opacity: 0 }
-              : { y: 18, opacity: 0, filter: 'blur(10px)' }
-          }
-          animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+          initial={shouldReduceMotion ? { opacity: 0 } : { y: 18, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
           transition={
             shouldReduceMotion
               ? { duration: 0.25 }
@@ -33,15 +29,12 @@ export function FloatingSoup() {
           }
           className="relative flex h-full w-full items-center justify-center"
         >
-          {/* Layer 2: Interactive hover lift + playful click spring pop */}
-          <motion.button
+          {/* Layer 2: Pure GPU CSS hover lift + click spring pop */}
+          <button
             type="button"
             onClick={handleSoupClick}
             aria-label="Sopa 3D do SoupMC"
-            whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
-            whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 20 }}
-            className="cursor-pointer border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-[#f0b000]/60 focus-visible:ring-offset-4 focus-visible:ring-offset-[#0f0f0f]"
+            className="cursor-pointer border-0 bg-transparent p-0 outline-none will-change-transform [backface-visibility:hidden] [transform:translateZ(0)] transition-transform duration-200 ease-out hover:[transform:translateZ(0)_scale(1.045)] active:[transform:translateZ(0)_scale(0.96)] focus-visible:ring-2 focus-visible:ring-[#f0b000]/60 focus-visible:ring-offset-4 focus-visible:ring-offset-[#0f0f0f]"
           >
             <motion.div
               key={popKey}
@@ -69,9 +62,27 @@ export function FloatingSoup() {
                     className="pointer-events-none h-auto w-[176px] select-none object-contain sm:w-[220px] lg:w-[248px]"
                   />
                 </picture>
+
+                {/* Subtle specular light sweep masked strictly to the soup silhouette */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 overflow-hidden"
+                  style={{
+                    WebkitMaskImage: `url(${soupPng})`,
+                    maskImage: `url(${soupPng})`,
+                    WebkitMaskSize: 'contain',
+                    maskSize: 'contain',
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                    WebkitMaskPosition: 'center',
+                    maskPosition: 'center',
+                  }}
+                >
+                  <div className="soup-sheen-sweep" />
+                </div>
               </div>
             </motion.div>
-          </motion.button>
+          </button>
         </motion.div>
       </div>
 

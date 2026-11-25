@@ -42,7 +42,7 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
       </div>
 
       {/* Fixed min-height tagline stage -> zero layout shift */}
-      <div className="mt-5 flex min-h-[2.6rem] items-center justify-center sm:mt-6 sm:min-h-[3rem]">
+      <div className="mt-5 flex min-h-[3.2rem] items-center justify-center sm:mt-6 sm:min-h-[3.8rem]">
         <AnimatePresence mode="wait" initial={false}>
           {phase === 'evolution' && (
             <motion.p
@@ -50,21 +50,20 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
               initial={
                 shouldReduceMotion
                   ? { opacity: 0 }
-                  : { y: 12, opacity: 0, filter: 'blur(6px)' }
+                  : { y: 12, opacity: 0 }
               }
-              animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+              animate={{ y: 0, opacity: 1 }}
               exit={
                 shouldReduceMotion
                   ? { opacity: 0 }
                   : {
                       y: -8,
                       opacity: 0,
-                      filter: 'blur(6px)',
                       transition: { duration: 0.35, ease: EASE_CINEMATIC },
                     }
               }
               transition={{ duration: 0.7, ease: EASE_CINEMATIC }}
-              className="text-center text-[clamp(1.05rem,4vw,1.25rem)] font-normal tracking-[-0.01em] text-[#8a8a8a] sm:text-[1.35rem] lg:text-[1.45rem]"
+              className="text-center text-[clamp(1.35rem,5.2vw,1.75rem)] font-medium tracking-[-0.015em] text-[#e5e5e5] [text-shadow:0_2px_0_rgba(0,0,0,0.8),0_6px_16px_rgba(0,0,0,0.88)] sm:text-[1.95rem] lg:text-[2.2rem]"
             >
               A evolução do HG
             </motion.p>
@@ -76,18 +75,18 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
               initial={
                 shouldReduceMotion
                   ? { opacity: 0 }
-                  : { y: 10, opacity: 0, filter: 'blur(6px)' }
+                  : { y: 10, opacity: 0 }
               }
-              animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+              animate={{ y: 0, opacity: 1 }}
               transition={
                 shouldReduceMotion
                   ? { duration: 0.25 }
                   : { duration: 0.55, ease: EASE_CINEMATIC }
               }
-              className="text-center text-[clamp(1.05rem,4vw,1.25rem)] font-normal tracking-[-0.01em] text-[#a3a3a3] sm:text-[1.35rem] lg:text-[1.45rem]"
+              className="text-center text-[clamp(1.35rem,5.2vw,1.75rem)] font-medium tracking-[-0.015em] text-[#cfcfcf] [text-shadow:0_2px_0_rgba(0,0,0,0.8),0_6px_16px_rgba(0,0,0,0.88)] sm:text-[1.95rem] lg:text-[2.2rem]"
             >
               O{' '}
-              <span className="relative inline-block pb-1 font-semibold text-[#fafafa]">
+              <span className="verdadeiro-highlight relative inline-block pb-1 font-semibold text-[#fafafa]">
                 verdadeiro
                 {/* Clean, sharp golden-to-ember underline drawing left-to-right */}
                 <motion.span
@@ -101,11 +100,10 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
                       ? { duration: 0 }
                       : { duration: 0.55, delay: 0.3, ease: EASE_CINEMATIC }
                   }
-                  className="pointer-events-none absolute right-0 bottom-0 left-0 h-[2.5px] origin-left rounded-[1px]"
+                  className="verdadeiro-underline pointer-events-none absolute right-0 bottom-0 left-0 h-[3px] origin-left rounded-[1px]"
                   style={{
                     background:
-                      'linear-gradient(90deg, #f0b000 0%, #e0401a 100%)',
-                    boxShadow: '0 0 12px rgba(240, 176, 0, 0.35)',
+                      'linear-gradient(90deg, #ffd24c 0%, #f0b000 50%, #e0401a 100%)',
                   }}
                 />
               </span>{' '}
