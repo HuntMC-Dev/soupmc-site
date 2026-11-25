@@ -1,25 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
-  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Sora", system-ui, -apple-system, sans-serif;
+  --font-sans: "Sora", system-ui, -apple-system, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
-  --bg-canvas: #090707;
-  --bg-elevated: #120e0d;
-  --bg-aura-amber: rgba(244, 169, 59, 0.14);
-  --bg-aura-rose: rgba(229, 162, 157, 0.08);
-  --text-primary: #fdf6f0;
-  --text-secondary: #b8a89e;
-  --text-muted: #7a6b63;
-  --accent-amber: #f4a93b;
-  --accent-amber-deep: #c87624;
-  --accent-rose: #e5a29d;
-  --border-subtle: rgba(253, 246, 240, 0.08);
-  --border-hover: rgba(244, 169, 59, 0.3);
-  --glass-bg: rgba(24, 18, 16, 0.58);
+  --bg: #0f0f0f;
+  --surface: #181818;
+  --text: #fafafa;
+  --text-muted: #8a8a8a;
+  --text-subtle: #666666;
+  --brand-gold-light: #ffd24c;
+  --brand-gold: #f0b000;
+  --brand-ember: #e0401a;
   --soup-float-y: -8px;
 }
 
@@ -31,14 +26,14 @@
 
 @media (min-width: 1024px) {
   :root {
-    --soup-float-y: -12px;
+    --soup-float-y: -11px;
   }
 }
 
 html,
 body {
-  background-color: var(--bg-canvas);
-  color: var(--text-primary);
+  background-color: var(--bg);
+  color: var(--text);
   font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100%;
@@ -59,129 +54,121 @@ body {
   0%,
   100% {
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
-    opacity: 0.62;
+    opacity: 0.58;
   }
   50% {
     transform: translate3d(0, 0, 0) scale3d(0.84, 0.84, 1);
-    opacity: 0.32;
-  }
-}
-
-@keyframes aura-breathe {
-  0%,
-  100% {
-    opacity: 0.82;
-    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
-  }
-  50% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale3d(1.045, 1.045, 1);
-  }
-}
-
-@keyframes status-pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  75%,
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
-}
-
-@keyframes mc-sheen {
-  0% {
-    background-position: -140% 0;
-  }
-  100% {
-    background-position: 220% 0;
+    opacity: 0.3;
   }
 }
 
 .soup-float-layer {
-  animation: soup-float 5.2s ease-in-out infinite;
+  animation: soup-float 5.6s ease-in-out infinite;
   will-change: transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
 .soup-shadow-layer {
-  animation: soup-shadow 5.2s ease-in-out infinite;
+  animation: soup-shadow 5.6s ease-in-out infinite;
   will-change: transform, opacity;
   backface-visibility: hidden;
 }
 
-.aura-breathe {
-  animation: aura-breathe 8s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-.status-pulse-ring {
-  animation: status-pulse-ring 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-}
-
-.mc-sheen-text {
+/* Official SoupMC gold-to-ember accent text gradient */
+.soupmc-accent-text {
   background-image: linear-gradient(
-    110deg,
-    #f4a93b 0%,
-    #f2b25c 35%,
-    #fff4df 48%,
-    #e5a29d 62%,
-    #f4a93b 100%
+    135deg,
+    var(--brand-gold-light) 0%,
+    var(--brand-gold) 52%,
+    var(--brand-ember) 100%
   );
-  background-size: 240% 100%;
-  background-position: 220% 0;
-  animation: mc-sheen 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s 1 both;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.bg-dot-grid {
-  background-image: radial-gradient(
-    rgba(253, 246, 240, 0.045) 1px,
-    transparent 1px
-  );
-  background-size: 28px 28px;
-  mask-image: radial-gradient(
-    ellipse 68% 62% at 50% 44%,
-    black 0%,
-    rgba(0, 0, 0, 0.45) 55%,
-    transparent 100%
-  );
-  -webkit-mask-image: radial-gradient(
-    ellipse 68% 62% at 50% 44%,
-    black 0%,
-    rgba(0, 0, 0, 0.45) 55%,
-    transparent 100%
-  );
-}
-
-.pointer-spotlight {
-  display: none;
+/* Per-character hover interaction on desktop (inspired by playhytalegames) */
+.wordmark-char {
+  display: inline-block;
+  transition: transform 0.25s ease, text-shadow 0.25s ease, filter 0.25s ease;
+  cursor: default;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .pointer-spotlight {
-    display: block;
-    background: radial-gradient(
-      480px circle at var(--mx, 50%) var(--my, 38%),
-      rgba(244, 169, 59, 0.075),
-      rgba(229, 162, 157, 0.025) 42%,
-      transparent 72%
-    );
+  .wordmark-char:hover {
+    transform: translateY(-3px) scale(1.08);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.42);
   }
+
+  .wordmark-char-accent:hover {
+    transform: translateY(-3px) scale(1.08);
+    filter: drop-shadow(0 0 18px rgba(240, 176, 0, 0.45));
+  }
+}
+
+/* Architectural hairline corner brackets (desktop) */
+.corner-bracket {
+  position: fixed;
+  width: 44px;
+  height: 44px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.corner-bracket::before,
+.corner-bracket::after {
+  content: "";
+  position: absolute;
+  background-color: rgba(250, 250, 250, 0.16);
+}
+
+.corner-bracket-tl {
+  top: 28px;
+  left: 28px;
+}
+
+.corner-bracket-tl::before {
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 40px;
+}
+
+.corner-bracket-tl::after {
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 1px;
+}
+
+.corner-bracket-br {
+  bottom: 58px;
+  right: 28px;
+}
+
+.corner-bracket-br::before {
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  height: 40px;
+}
+
+.corner-bracket-br::after {
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 1px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .soup-float-layer,
-  .soup-shadow-layer,
-  .aura-breathe,
-  .status-pulse-ring,
-  .mc-sheen-text {
+  .soup-shadow-layer {
     animation: none !important;
   }
 
-  .pointer-spotlight {
-    display: none !important;
+  .wordmark-char,
+  .wordmark-char-accent {
+    transition: none !important;
   }
 }

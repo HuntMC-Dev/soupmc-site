@@ -1,117 +1,100 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 
 const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
-const SPRING_MORPH = {
-  type: 'spring' as const,
-  stiffness: 260,
-  damping: 24,
-  mass: 0.9,
+const PREFIX_CHARS = ['S', 'o', 'u', 'p'] as const
+
+interface FlipCharSlotProps {
+  from: string
+  to: string
+  flipped: boolean
+}
+
+function FlipCharSlot({ from, to, flipped }: FlipCharSlotProps) {
+  const shouldReduceMotion = useReducedMotion()
+  const activeChar = flipped ? to : from
+
+  return (
+    <span
+      className="relative inline-grid place-items-center"
+      style={{ perspective: 420 }}
+    >
+      {/* Invisible ghosts lock exact slot width -> zero horizontal shift */}
+      <span aria-hidden="true" className="invisible col-start-1 row-start-1 select-none pointer-events-none">
+        {from}
+      </span>
+      <span aria-hidden="true" className="invisible col-start-1 row-start-1 select-none pointer-events-none">
+        {to}
+      </span>
+
+      <span className="wordmark-char wordmark-char-accent col-start-1 row-start-1 inline-flex items-center justify-center">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={activeChar}
+            initial={
+              shouldReduceMotion
+                ? false
+                : { rotateX: -90, opacity: 0.35 }
+            }
+            animate={{ rotateX: 0, opacity: 1 }}
+            exit={
+              shouldReduceMotion
+                ? { opacity: 0 }
+                : {
+                    rotateX: 90,
+                    opacity: 0.35,
+                    transition: { duration: 0.2, ease: 'easeIn' },
+                  }
+            }
+            transition={
+              shouldReduceMotion
+                ? { duration: 0.15 }
+                : { duration: 0.26, ease: 'easeOut' }
+            }
+            style={{ transformStyle: 'preserve-3d', display: 'inline-block' }}
+            className="soupmc-accent-text"
+          >
+            {activeChar}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+    </span>
+  )
 }
 
 interface BrandWordmarkProps {
-  suffix: 'HG' | 'MC'
+  firstFlipped: boolean
+  secondFlipped: boolean
 }
 
-export function BrandWordmark({ suffix }: BrandWordmarkProps) {
+export function BrandWordmark({
+  firstFlipped,
+  secondFlipped,
+}: BrandWordmarkProps) {
   const shouldReduceMotion = useReducedMotion()
 
   return (
     <motion.h1
       initial={
-        shouldReduceMotion ? { opacity: 0 } : { y: 16, opacity: 0 }
+        shouldReduceMotion
+          ? { opacity: 0 }
+          : { y: 18, opacity: 0, filter: 'blur(10px)' }
       }
-      animate={{ y: 0, opacity: 1 }}
+      animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
       transition={
         shouldReduceMotion
           ? { duration: 0.25 }
-          : { duration: 0.6, delay: 0.65, ease: EASE_CINEMATIC }
+          : { duration: 0.8, delay: 0.95, ease: EASE_CINEMATIC }
       }
       aria-label="SoupMC"
-      className="font-display mt-6 flex items-baseline justify-center text-[clamp(2.75rem,11vw,3.5rem)] leading-none font-bold tracking-[-0.04em] select-none sm:mt-8 sm:text-[4.25rem] lg:text-[5rem]"
+      className="font-display mt-6 flex items-baseline justify-center text-[clamp(2.85rem,11vw,3.75rem)] leading-[1.08] font-bold tracking-[-0.02em] whitespace-nowrap select-none sm:mt-7 sm:text-[4.5rem] lg:text-[5.25rem]"
     >
-      <span className="text-[var(--text-primary)]">Soup</span>
-
-      {/* Stable inline-grid slot locks exact width of HG/MC -> zero horizontal shift */}
-      <span className="relative inline-grid place-items-baseline overflow-visible">
-        <span
-          aria-hidden="true"
-          className="invisible col-start-1 row-start-1 pointer-events-none"
-        >
-          HG
+      {PREFIX_CHARS.map((ch, idx) => (
+        <span key={`${ch}-${idx}`} className="wordmark-char text-[#fafafa]">
+          {ch}
         </span>
-        <span
-          aria-hidden="true"
-          className="invisible col-start-1 row-start-1 pointer-events-none"
-        >
-          MC
-        </span>
-
-        <span className="relative col-start-1 row-start-1 inline-flex items-baseline justify-start">
-          <AnimatePresence mode="popLayout" initial={false}>
-            {suffix === 'HG' ? (
-              <motion.span
-                key="HG"
-                initial={false}
-                animate={{
-                  y: '0%',
-                  opacity: 1,
-                  filter: 'blur(0px)',
-                  scale: 1,
-                }}
-                exit={
-                  shouldReduceMotion
-                    ? { opacity: 0 }
-                    : {
-                        y: '-55%',
-                        opacity: 0,
-                        filter: 'blur(6px)',
-                        scale: 0.92,
-                        transition: {
-                          duration: 0.38,
-                          ease: EASE_CINEMATIC,
-                        },
-                      }
-                }
-                className="inline-block bg-gradient-to-br from-[#F4A93B] via-[#F2B563] to-[#E5A29D] bg-clip-text text-transparent"
-                style={{
-                  filter: 'drop-shadow(0 0 22px rgba(244, 169, 59, 0.26))',
-                }}
-              >
-                HG
-              </motion.span>
-            ) : (
-              <motion.span
-                key="MC"
-                initial={
-                  shouldReduceMotion
-                    ? false
-                    : {
-                        y: '55%',
-                        opacity: 0,
-                        filter: 'blur(6px)',
-                        scale: 0.96,
-                      }
-                }
-                animate={{
-                  y: '0%',
-                  opacity: 1,
-                  filter: 'blur(0px)',
-                  scale: 1,
-                }}
-                transition={
-                  shouldReduceMotion ? { duration: 0.2 } : SPRING_MORPH
-                }
-                className="mc-sheen-text inline-block bg-clip-text text-transparent"
-                style={{
-                  filter: 'drop-shadow(0 0 24px rgba(244, 169, 59, 0.3))',
-                }}
-              >
-                MC
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </span>
-      </span>
+      ))}
+      <FlipCharSlot from="H" to="M" flipped={firstFlipped} />
+      <FlipCharSlot from="G" to="C" flipped={secondFlipped} />
     </motion.h1>
   )
 }

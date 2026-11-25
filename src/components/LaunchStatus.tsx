@@ -57,48 +57,42 @@ export function LaunchStatus() {
 
   return (
     <motion.div
-      initial={shouldReduceMotion ? { opacity: 0 } : { y: 12, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      role="status"
+      aria-live="polite"
+      initial={
+        shouldReduceMotion
+          ? { opacity: 0 }
+          : { y: 14, opacity: 0, filter: 'blur(6px)' }
+      }
+      animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
       transition={
         shouldReduceMotion
           ? { duration: 0.25 }
-          : { duration: 0.55, delay: 3.7, ease: EASE_CINEMATIC }
+          : { duration: 0.7, delay: 8.3, ease: EASE_CINEMATIC }
       }
-      className="mt-8 flex items-center justify-center sm:mt-10"
+      className="mt-8 flex items-center justify-center text-center sm:mt-10"
     >
-      <div
-        role="status"
-        aria-live="polite"
-        className="group relative inline-flex min-h-[44px] items-center gap-3 rounded-full border border-[var(--border-subtle)] bg-[var(--glass-bg)] px-5 py-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(253,246,240,0.06)] backdrop-blur-md transition-colors duration-300 hover:border-[var(--border-hover)]"
-      >
-        {/* Pulsing amber indicator dot */}
-        <span className="relative flex h-2 w-2 shrink-0 items-center justify-center">
-          <span className="status-pulse-ring absolute inline-flex h-full w-full rounded-full bg-[#F4A93B]" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F4A93B] shadow-[0_0_10px_rgba(244,169,59,0.85)]" />
-        </span>
-
-        {isValidCountdown ? (
-          <span className="font-mono text-xs font-medium tracking-[0.14em] text-[var(--text-primary)] uppercase tabular-nums sm:text-[13px]">
-            {countdown.completed ? (
-              'Disponível agora'
-            ) : (
-              <span className="inline-flex items-center gap-2">
-                <span>{pad2(countdown.days)}d</span>
-                <span className="text-[var(--text-muted)]">:</span>
-                <span>{pad2(countdown.hours)}h</span>
-                <span className="text-[var(--text-muted)]">:</span>
-                <span>{pad2(countdown.minutes)}m</span>
-                <span className="text-[var(--text-muted)]">:</span>
-                <span>{pad2(countdown.seconds)}s</span>
-              </span>
-            )}
-          </span>
-        ) : (
-          <span className="font-mono text-xs font-medium tracking-[0.16em] text-[var(--text-primary)] uppercase tabular-nums sm:text-[13px]">
-            {label}
-          </span>
-        )}
-      </div>
+      {isValidCountdown ? (
+        <p className="font-mono text-[clamp(1.5rem,4.8vw,2.4rem)] font-bold tracking-[0.16em] text-[#fafafa] uppercase tabular-nums [text-shadow:0_0_32px_rgba(240,176,0,0.2)]">
+          {countdown.completed ? (
+            'DISPONÍVEL AGORA'
+          ) : (
+            <span className="inline-flex items-baseline gap-2 sm:gap-3">
+              <span>{pad2(countdown.days)}d</span>
+              <span className="text-[#f0b000]">:</span>
+              <span>{pad2(countdown.hours)}h</span>
+              <span className="text-[#f0b000]">:</span>
+              <span>{pad2(countdown.minutes)}m</span>
+              <span className="text-[#f0b000]">:</span>
+              <span>{pad2(countdown.seconds)}s</span>
+            </span>
+          )}
+        </p>
+      ) : (
+        <p className="font-display pl-[0.24em] text-[clamp(1.65rem,5vw,2.6rem)] font-bold tracking-[0.24em] text-[#fafafa] uppercase [text-shadow:0_0_32px_rgba(240,176,0,0.22)]">
+          {label}
+        </p>
+      )}
     </motion.div>
   )
 }
