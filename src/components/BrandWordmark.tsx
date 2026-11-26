@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   AnimatePresence,
   motion,
@@ -13,30 +13,105 @@ const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
 const PREFIX_CHARS = ['S', 'o', 'u', 'p'] as const
 
 const SPRING_WAVE = {
-  mass: 0.12,
-  stiffness: 280,
-  damping: 20,
+  mass: 0.14,
+  stiffness: 260,
+  damping: 22,
+}
+
+const SPRING_PRESS = {
+  mass: 0.16,
+  stiffness: 240,
+  damping: 22,
 }
 
 const WAVE_RADIUS = 135
+const HOVER_SCALE_BOOST = 0.05
+const HOVER_Y_LIFT = 2.2
+const PRESS_SCALE_BOOST = 0.16
+const PRESS_Y_LIFT = 6.5
+
+interface RippleState {
+  originX: number
+  startTime: number
+}
 
 function useDockWave(
   ref: React.RefObject<HTMLSpanElement | null>,
   mouseX: MotionValue<number>,
+  pressLevel: MotionValue<number>,
+  rippleTick: MotionValue<number>,
+  rippleRef: React.RefObject<RippleState | null>,
   disabled: boolean,
 ) {
-  const influence = useTransform(mouseX, (x) => {
-    if (disabled || !Number.isFinite(x) || !ref.current) return 0
-    const rect = ref.current.getBoundingClientRect()
-    const center = rect.left + rect.width / 2
-    const dist = Math.abs(x - center)
-    if (dist >= WAVE_RADIUS) return 0
-    // Smooth cosine bell curve: 1 at center, 0 at WAVE_RADIUS, C1-smooth everywhere
-    return 0.5 * (1 + Math.cos((Math.PI * dist) / WAVE_RADIUS))
-  })
+  const rawScale = useTransform(
+    [mouseX, pressLevel, rippleTick],
+    ([xVal, pVal]: number[]) => {
+      if (disabled || !ref.current) return 1
+      const rect = ref.current.getBoundingClientRect()
+      const center = rect.left + rect.width / 2
 
-  const rawScale = useTransform(influence, (t) => 1 + t * 0.16)
-  const rawY = useTransform(influence, (t) => -t * 6.5)
+      let hoverScale = 0
+      if (Number.isFinite(xVal)) {
+        const dist = Math.abs(xVal - center)
+        if (dist < WAVE_RADIUS) {
+          const t = 0.5 * (1 + Math.cos((Math.PI * dist) / WAVE_RADIUS))
+          const boost =
+            HOVER_SCALE_BOOST + (PRESS_SCALE_BOOST - HOVER_SCALE_BOOST) * pVal
+          hoverScale = t * boost
+        }
+      }
+
+      let rippleScale = 0
+      const ripple = rippleRef.current
+      if (ripple) {
+        const dist = Math.abs(center - ripple.originX)
+        const delayMs = dist * 1.1
+        const elapsed = performance.now() - ripple.startTime - delayMs
+        if (elapsed >= 0) {
+          const decay = Math.exp(-elapsed / 320)
+          const atten = 1 / (1 + dist / 260)
+          rippleScale =
+            decay * Math.cos((elapsed / 1000) * 14.5) * atten * 0.1
+        }
+      }
+
+      return 1 + hoverScale + rippleScale
+    },
+  )
+
+  const rawY = useTransform(
+    [mouseX, pressLevel, rippleTick],
+    ([xVal, pVal]: number[]) => {
+      if (disabled || !ref.current) return 0
+      const rect = ref.current.getBoundingClientRect()
+      const center = rect.left + rect.width / 2
+
+      let hoverY = 0
+      if (Number.isFinite(xVal)) {
+        const dist = Math.abs(xVal - center)
+        if (dist < WAVE_RADIUS) {
+          const t = 0.5 * (1 + Math.cos((Math.PI * dist) / WAVE_RADIUS))
+          const lift = HOVER_Y_LIFT + (PRESS_Y_LIFT - HOVER_Y_LIFT) * pVal
+          hoverY = -t * lift
+        }
+      }
+
+      let rippleY = 0
+      const ripple = rippleRef.current
+      if (ripple) {
+        const dist = Math.abs(center - ripple.originX)
+        const delayMs = dist * 1.1
+        const elapsed = performance.now() - ripple.startTime - delayMs
+        if (elapsed >= 0) {
+          const decay = Math.exp(-elapsed / 320)
+          const atten = 1 / (1 + dist / 260)
+          rippleY = -decay * Math.cos((elapsed / 1000) * 14.5) * atten * 6.5
+        }
+      }
+
+      return hoverY + rippleY
+    },
+  )
 
   const scale = useSpring(rawScale, SPRING_WAVE)
   const y = useSpring(rawY, SPRING_WAVE)
@@ -47,12 +122,28 @@ function useDockWave(
 interface WaveCharProps {
   char: string
   mouseX: MotionValue<number>
+  pressLevel: MotionValue<number>
+  rippleTick: MotionValue<number>
+  rippleRef: React.RefObject<RippleState | null>
 }
 
-function WaveChar({ char, mouseX }: WaveCharProps) {
+function WaveChar({
+  char,
+  mouseX,
+  pressLevel,
+  rippleTick,
+  rippleRef,
+}: WaveCharProps) {
   const shouldReduceMotion = useReducedMotion()
   const ref = useRef<HTMLSpanElement>(null)
-  const { scale, y } = useDockWave(ref, mouseX, Boolean(shouldReduceMotion))
+  const { scale, y } = useDockWave(
+    ref,
+    mouseX,
+    pressLevel,
+    rippleTick,
+    rippleRef,
+    Boolean(shouldReduceMotion),
+  )
 
   return (
     <span ref={ref} className="inline-block cursor-pointer">
@@ -68,15 +159,33 @@ function WaveChar({ char, mouseX }: WaveCharProps) {
 
 interface FlipCharSlotProps {
   mouseX: MotionValue<number>
+  pressLevel: MotionValue<number>
+  rippleTick: MotionValue<number>
+  rippleRef: React.RefObject<RippleState | null>
   from: string
   to: string
   flipped: boolean
 }
 
-function FlipCharSlot({ mouseX, from, to, flipped }: FlipCharSlotProps) {
+function FlipCharSlot({
+  mouseX,
+  pressLevel,
+  rippleTick,
+  rippleRef,
+  from,
+  to,
+  flipped,
+}: FlipCharSlotProps) {
   const shouldReduceMotion = useReducedMotion()
   const ref = useRef<HTMLSpanElement>(null)
-  const { scale, y } = useDockWave(ref, mouseX, Boolean(shouldReduceMotion))
+  const { scale, y } = useDockWave(
+    ref,
+    mouseX,
+    pressLevel,
+    rippleTick,
+    rippleRef,
+    Boolean(shouldReduceMotion),
+  )
   const activeChar = flipped ? to : from
 
   return (
@@ -146,6 +255,69 @@ export function BrandWordmark({
 }: BrandWordmarkProps) {
   const shouldReduceMotion = useReducedMotion()
   const mouseX = useMotionValue(Number.POSITIVE_INFINITY)
+  const rawPress = useMotionValue(0)
+  const pressLevel = useSpring(rawPress, SPRING_PRESS)
+  const rippleTick = useMotionValue(0)
+
+  const isPressedRef = useRef(false)
+  const lastXRef = useRef(0)
+  const rippleRef = useRef<RippleState | null>(null)
+  const rafRef = useRef<number | null>(null)
+
+  const stopRippleLoop = () => {
+    if (rafRef.current !== null) {
+      window.cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+    }
+  }
+
+  const triggerRipple = (originX: number) => {
+    if (shouldReduceMotion) return
+    stopRippleLoop()
+    rippleRef.current = { originX, startTime: performance.now() }
+
+    const step = () => {
+      const ripple = rippleRef.current
+      if (!ripple) return
+      const elapsed = performance.now() - ripple.startTime
+      rippleTick.set(elapsed)
+      if (elapsed < 1650) {
+        rafRef.current = window.requestAnimationFrame(step)
+      } else {
+        rippleRef.current = null
+        rippleTick.set(0)
+        rafRef.current = null
+      }
+    }
+
+    rafRef.current = window.requestAnimationFrame(step)
+  }
+
+  useEffect(() => {
+    const handlePointerUp = (e: PointerEvent) => {
+      if (!isPressedRef.current) return
+      isPressedRef.current = false
+      rawPress.set(0)
+      triggerRipple(Number.isFinite(e.clientX) ? e.clientX : lastXRef.current)
+    }
+
+    const handlePointerCancel = () => {
+      if (!isPressedRef.current) return
+      isPressedRef.current = false
+      rawPress.set(0)
+    }
+
+    window.addEventListener('pointerup', handlePointerUp, { passive: true })
+    window.addEventListener('pointercancel', handlePointerCancel, {
+      passive: true,
+    })
+
+    return () => {
+      window.removeEventListener('pointerup', handlePointerUp)
+      window.removeEventListener('pointercancel', handlePointerCancel)
+      stopRippleLoop()
+    }
+  }, [shouldReduceMotion, rawPress, rippleTick])
 
   return (
     <motion.h1
@@ -157,19 +329,55 @@ export function BrandWordmark({
           : { duration: 0.8, delay: 0.95, ease: EASE_CINEMATIC }
       }
       onPointerMove={(e) => {
-        if (e.pointerType === 'mouse' && !shouldReduceMotion) {
+        if (shouldReduceMotion) return
+        if (e.pointerType === 'mouse' || isPressedRef.current) {
+          lastXRef.current = e.clientX
           mouseX.set(e.clientX)
         }
       }}
-      onPointerLeave={() => mouseX.set(Number.POSITIVE_INFINITY)}
+      onPointerDown={(e) => {
+        if (shouldReduceMotion) return
+        isPressedRef.current = true
+        lastXRef.current = e.clientX
+        mouseX.set(e.clientX)
+        rawPress.set(1)
+      }}
+      onPointerLeave={() => {
+        if (!isPressedRef.current) {
+          mouseX.set(Number.POSITIVE_INFINITY)
+        }
+      }}
       aria-label="SoupMC"
       className="font-display mt-6 flex items-baseline justify-center px-4 text-[clamp(2.85rem,11vw,3.75rem)] leading-[1.08] font-bold tracking-[-0.02em] whitespace-nowrap select-none sm:mt-7 sm:text-[4.5rem] lg:text-[5.25rem]"
     >
       {PREFIX_CHARS.map((ch, idx) => (
-        <WaveChar key={`${ch}-${idx}`} char={ch} mouseX={mouseX} />
+        <WaveChar
+          key={`${ch}-${idx}`}
+          char={ch}
+          mouseX={mouseX}
+          pressLevel={pressLevel}
+          rippleTick={rippleTick}
+          rippleRef={rippleRef}
+        />
       ))}
-      <FlipCharSlot mouseX={mouseX} from="H" to="M" flipped={firstFlipped} />
-      <FlipCharSlot mouseX={mouseX} from="G" to="C" flipped={secondFlipped} />
+      <FlipCharSlot
+        mouseX={mouseX}
+        pressLevel={pressLevel}
+        rippleTick={rippleTick}
+        rippleRef={rippleRef}
+        from="H"
+        to="M"
+        flipped={firstFlipped}
+      />
+      <FlipCharSlot
+        mouseX={mouseX}
+        pressLevel={pressLevel}
+        rippleTick={rippleTick}
+        rippleRef={rippleRef}
+        from="G"
+        to="C"
+        flipped={secondFlipped}
+      />
     </motion.h1>
   )
 }
