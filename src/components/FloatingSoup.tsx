@@ -11,10 +11,14 @@ export function FloatingSoup() {
   const [popKey, setPopKey] = useState(0)
   const splashRef = useRef<SoupSplashHandle>(null)
 
-  const handleSoupClick = () => {
+  const handleSoupClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (shouldReduceMotion) return
     setPopKey((prev) => prev + 1)
-    splashRef.current?.splash()
+    const hasCoords = e.clientX !== 0 || e.clientY !== 0
+    splashRef.current?.splash(
+      hasCoords ? e.clientX : undefined,
+      hasCoords ? e.clientY : undefined,
+    )
   }
 
   return (
