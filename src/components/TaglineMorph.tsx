@@ -54,7 +54,7 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
         </motion.div>
       </div>
 
-      {/* Fixed min-height tagline stage -> only the changing words morph while HG stays anchored */}
+      {/* Fixed min-height tagline stage -> locked slot widths keep "A/O" and "HG" 100% stationary */}
       <div className="mt-5 flex min-h-[3.2rem] items-center justify-center sm:mt-6 sm:min-h-[3.8rem]">
         {phase !== 'hidden' && (
           <motion.p
@@ -67,16 +67,18 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
             }
             className="inline-flex items-baseline justify-center text-center text-[clamp(1.35rem,5.2vw,1.75rem)] font-medium tracking-[-0.015em] text-[#dcdcdc] [text-shadow:0_2px_0_rgba(0,0,0,0.8),0_6px_16px_rgba(0,0,0,0.88)] sm:text-[1.95rem] lg:text-[2.2rem]"
           >
-            {/* Leading article: A -> O */}
-            <motion.span
-              layout
-              transition={{ duration: 0.45, ease: EASE_CINEMATIC }}
-              className="relative inline-grid place-items-center"
-            >
-              <span aria-hidden="true" className="invisible col-start-1 row-start-1 select-none">
+            {/* Leading article: locked inline-grid slot (A -> O) */}
+            <span className="relative inline-grid place-items-center">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none invisible col-start-1 row-start-1 select-none"
+              >
                 O
               </span>
-              <span aria-hidden="true" className="invisible col-start-1 row-start-1 select-none">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none invisible col-start-1 row-start-1 select-none"
+              >
                 A
               </span>
               <AnimatePresence mode="wait" initial={false}>
@@ -87,7 +89,11 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
                   exit={
                     shouldReduceMotion
                       ? { opacity: 0 }
-                      : { opacity: 0, y: -6, transition: { duration: 0.2, ease: EASE_CINEMATIC } }
+                      : {
+                          opacity: 0,
+                          y: -6,
+                          transition: { duration: 0.2, ease: EASE_CINEMATIC },
+                        }
                   }
                   transition={{ duration: 0.26, ease: EASE_CINEMATIC }}
                   className="col-start-1 row-start-1 inline-block"
@@ -95,100 +101,82 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
                   {phase === 'true' ? 'O' : 'A'}
                 </motion.span>
               </AnimatePresence>
-            </motion.span>
+            </span>
 
             <span>&nbsp;</span>
 
-            {/* Center word: evolução -> verdadeiro */}
-            <motion.span
-              layout
-              transition={{ duration: 0.45, ease: EASE_CINEMATIC }}
-              className="relative inline-flex items-baseline justify-center"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {phase === 'evolution' ? (
-                  <motion.span
-                    key="evolucao"
-                    initial={false}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={
-                      shouldReduceMotion
-                        ? { opacity: 0 }
-                        : {
-                            opacity: 0,
-                            y: -10,
-                            transition: { duration: 0.28, ease: EASE_CINEMATIC },
-                          }
-                    }
-                    className="inline-block text-[#e5e5e5]"
-                  >
-                    evolução
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="verdadeiro"
-                    initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={
-                      shouldReduceMotion
-                        ? { duration: 0.2 }
-                        : { duration: 0.42, ease: EASE_CINEMATIC }
-                    }
-                    className="verdadeiro-highlight relative inline-block pb-1 font-semibold text-[#fafafa]"
-                  >
-                    verdadeiro
-                    {/* Clean, sharp golden-to-ember underline drawing left-to-right */}
+            {/* Center slot: locked inline-grid width holds "evolução do" and "verdadeiro" so "HG" NEVER moves */}
+            <span className="relative inline-grid place-items-center">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none invisible col-start-1 row-start-1 whitespace-nowrap select-none"
+              >
+                evolução do
+              </span>
+              <span
+                aria-hidden="true"
+                className="pointer-events-none invisible col-start-1 row-start-1 pb-1 font-semibold whitespace-nowrap select-none"
+              >
+                verdadeiro
+              </span>
+
+              <span className="col-start-1 row-start-1 inline-flex items-baseline justify-center whitespace-nowrap">
+                <AnimatePresence mode="wait" initial={false}>
+                  {phase === 'evolution' ? (
                     <motion.span
-                      aria-hidden="true"
-                      initial={shouldReduceMotion ? { scaleX: 1 } : { scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
+                      key="evolucao"
+                      initial={false}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={
+                        shouldReduceMotion
+                          ? { opacity: 0 }
+                          : {
+                              opacity: 0,
+                              y: -10,
+                              transition: { duration: 0.26, ease: EASE_CINEMATIC },
+                            }
+                      }
+                      className="inline-block text-[#e5e5e5]"
+                    >
+                      evolução do
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="verdadeiro"
+                      initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={
                         shouldReduceMotion
-                          ? { duration: 0 }
-                          : { duration: 0.55, delay: 0.28, ease: EASE_CINEMATIC }
+                          ? { duration: 0.2 }
+                          : { duration: 0.38, ease: EASE_CINEMATIC }
                       }
-                      className="verdadeiro-underline pointer-events-none absolute right-0 bottom-0 left-0 h-[3px] origin-left rounded-[1px]"
-                      style={{
-                        background:
-                          'linear-gradient(90deg, #ffd24c 0%, #f0b000 50%, #e0401a 100%)',
-                      }}
-                    />
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.span>
-
-            {/* Connector " do" collapses smoothly when switching to "O verdadeiro HG" */}
-            <AnimatePresence initial={false}>
-              {phase === 'evolution' && (
-                <motion.span
-                  key="do"
-                  initial={{ opacity: 1, width: 'auto' }}
-                  animate={{ opacity: 1, width: 'auto' }}
-                  exit={
-                    shouldReduceMotion
-                      ? { opacity: 0, width: 0 }
-                      : {
-                          opacity: 0,
-                          width: 0,
-                          transition: { duration: 0.3, ease: EASE_CINEMATIC },
+                      className="verdadeiro-highlight relative inline-block pb-1 font-semibold text-[#fafafa]"
+                    >
+                      verdadeiro
+                      {/* Clean, sharp golden-to-ember underline drawing left-to-right */}
+                      <motion.span
+                        aria-hidden="true"
+                        initial={shouldReduceMotion ? { scaleX: 1 } : { scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={
+                          shouldReduceMotion
+                            ? { duration: 0 }
+                            : { duration: 0.55, delay: 0.24, ease: EASE_CINEMATIC }
                         }
-                  }
-                  className="inline-block overflow-hidden whitespace-pre"
-                >
-                  {' do'}
-                </motion.span>
-              )}
-            </AnimatePresence>
+                        className="verdadeiro-underline pointer-events-none absolute right-0 bottom-0 left-0 h-[3px] origin-left rounded-[1px]"
+                        style={{
+                          background:
+                            'linear-gradient(90deg, #ffd24c 0%, #f0b000 50%, #e0401a 100%)',
+                        }}
+                      />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </span>
+            </span>
 
-            {/* Anchored " HG" stays mounted and never blinks */}
-            <motion.span
-              layout
-              transition={{ duration: 0.45, ease: EASE_CINEMATIC }}
-              className="inline-block whitespace-pre"
-            >
-              {' HG'}
-            </motion.span>
+            {/* Anchored " HG" stays 100% stationary — zero horizontal movement */}
+            <span className="inline-block whitespace-pre">{' HG'}</span>
           </motion.p>
         )}
       </div>
