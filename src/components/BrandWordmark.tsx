@@ -263,6 +263,7 @@ export function BrandWordmark({
   const lastXRef = useRef(0)
   const rippleRef = useRef<RippleState | null>(null)
   const rafRef = useRef<number | null>(null)
+  const wordmarkRef = useRef<HTMLHeadingElement>(null)
 
   const stopRippleLoop = () => {
     if (rafRef.current !== null) {
@@ -293,6 +294,19 @@ export function BrandWordmark({
     rafRef.current = window.requestAnimationFrame(step)
   }
 
+  // Trigger a left-to-right entrance ripple from "S" right as SoupHG finishes appearing
+  useEffect(() => {
+    if (shouldReduceMotion) return
+    const timer = window.setTimeout(() => {
+      const firstChar = wordmarkRef.current?.firstElementChild
+      if (firstChar) {
+        const rect = firstChar.getBoundingClientRect()
+        triggerRipple(rect.left + rect.width / 2)
+      }
+    }, 1720)
+    return () => window.clearTimeout(timer)
+  }, [shouldReduceMotion])
+
   useEffect(() => {
     const handlePointerUp = (e: PointerEvent) => {
       if (!isPressedRef.current) return
@@ -321,6 +335,7 @@ export function BrandWordmark({
 
   return (
     <motion.h1
+      ref={wordmarkRef}
       initial={shouldReduceMotion ? { opacity: 0 } : { y: 18, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={
