@@ -294,7 +294,7 @@ export function BrandWordmark({
     rafRef.current = window.requestAnimationFrame(step)
   }
 
-  // Trigger a left-to-right entrance ripple from "S" right as SoupHG begins appearing
+  // Trigger a left-to-right entrance ripple from "S" right as SoupHG begins appearing (1250ms, as splash finishes)
   useEffect(() => {
     if (shouldReduceMotion) return
     const timer = window.setTimeout(() => {
@@ -303,7 +303,7 @@ export function BrandWordmark({
         const rect = firstChar.getBoundingClientRect()
         triggerRipple(rect.left + rect.width / 2)
       }
-    }, 950)
+    }, 1250)
     return () => window.clearTimeout(timer)
   }, [shouldReduceMotion])
 
@@ -341,7 +341,7 @@ export function BrandWordmark({
       transition={
         shouldReduceMotion
           ? { duration: 0.25 }
-          : { duration: 0.8, delay: 0.95, ease: EASE_CINEMATIC }
+          : { duration: 0.8, delay: 1.25, ease: EASE_CINEMATIC }
       }
       onPointerMove={(e) => {
         if (shouldReduceMotion) return

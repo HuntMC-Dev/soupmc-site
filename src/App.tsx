@@ -37,11 +37,11 @@ function HeroStage() {
       return
     }
 
-    const t1 = window.setTimeout(() => setFirstFlipped(true), 3150)
-    const t2 = window.setTimeout(() => setSecondFlipped(true), 3330)
-    const t3 = window.setTimeout(() => setShowDivider(true), 4150)
-    const t4 = window.setTimeout(() => setTaglinePhase('evolution'), 4550)
-    const t5 = window.setTimeout(() => setTaglinePhase('true'), 6850)
+    const t1 = window.setTimeout(() => setFirstFlipped(true), 3450)
+    const t2 = window.setTimeout(() => setSecondFlipped(true), 3630)
+    const t3 = window.setTimeout(() => setShowDivider(true), 4450)
+    const t4 = window.setTimeout(() => setTaglinePhase('evolution'), 4850)
+    const t5 = window.setTimeout(() => setTaglinePhase('true'), 7150)
 
     return () => {
       window.clearTimeout(t1)

@@ -64,7 +64,7 @@ export function LaunchStatus() {
       transition={
         shouldReduceMotion
           ? { duration: 0.25 }
-          : { duration: 0.7, delay: 8.3, ease: EASE_CINEMATIC }
+          : { duration: 0.7, delay: 8.6, ease: EASE_CINEMATIC }
       }
       className="mt-8 flex items-center justify-center text-center sm:mt-10"
     >

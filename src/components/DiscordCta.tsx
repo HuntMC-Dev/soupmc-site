@@ -16,7 +16,7 @@ export function DiscordCta() {
       transition={
         shouldReduceMotion
           ? { duration: 0.25 }
-          : { duration: 0.65, delay: 9.05, ease: EASE_CINEMATIC }
+          : { duration: 0.65, delay: 9.35, ease: EASE_CINEMATIC }
       }
       className="mt-7 flex items-center justify-center sm:mt-8"
     >

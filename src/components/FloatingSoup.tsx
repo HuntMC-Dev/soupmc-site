@@ -11,13 +11,13 @@ export function FloatingSoup() {
   const [popKey, setPopKey] = useState(0)
   const splashRef = useRef<SoupSplashHandle>(null)
 
-  // Trigger recoil + liquid splash right as SoupHG begins appearing and rippling (950ms)
+  // Trigger recoil + liquid splash right as the soup finishes appearing (650ms)
   useEffect(() => {
     if (shouldReduceMotion) return
     const timer = window.setTimeout(() => {
       setPopKey((prev) => prev + 1)
       splashRef.current?.splash()
-    }, 950)
+    }, 650)
     return () => window.clearTimeout(timer)
   }, [shouldReduceMotion])
 
