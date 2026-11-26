@@ -1,21 +1,27 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import soupPng from '../assets/soup.png'
 import soupWebp from '../assets/soup.webp'
+import { SoupSplashCanvas, type SoupSplashHandle } from './SoupSplashCanvas'
 
 const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 export function FloatingSoup() {
   const shouldReduceMotion = useReducedMotion()
   const [popKey, setPopKey] = useState(0)
+  const splashRef = useRef<SoupSplashHandle>(null)
 
   const handleSoupClick = () => {
     if (shouldReduceMotion) return
     setPopKey((prev) => prev + 1)
+    splashRef.current?.splash()
   }
 
   return (
     <div className="relative flex flex-col items-center justify-center">
+      {/* HiDPI voxel stew splash canvas positioned right over the soup bowl */}
+      <SoupSplashCanvas ref={splashRef} />
+
       {/* Fixed-height stage container -> CLS = 0 */}
       <div className="relative flex h-[132px] w-[176px] items-center justify-center sm:h-[162px] sm:w-[220px] lg:h-[184px] lg:w-[248px]">
         {/* Layer 1: Smooth entrance (0.00s - 0.90s, no persistent filter layer) */}
