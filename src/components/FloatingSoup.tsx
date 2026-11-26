@@ -47,38 +47,40 @@ export function FloatingSoup() {
                 mass: 0.7,
               }}
             >
-              {/* Layer 3: Pure CSS GPU-composited continuous float (zero flicker) */}
+              {/* Layer 3: Decoupled vertical bob (5.4s) + out-of-phase organic tilt (7.3s) */}
               <div className="soup-float-layer relative flex items-center justify-center">
-                <picture>
-                  <source srcSet={soupWebp} type="image/webp" />
-                  <img
-                    src={soupPng}
-                    alt="Sopa 3D do SoupMC"
-                    width={1024}
-                    height={682}
-                    decoding="async"
-                    fetchPriority="high"
-                    draggable={false}
-                    className="pointer-events-none h-auto w-[176px] select-none object-contain sm:w-[220px] lg:w-[248px]"
-                  />
-                </picture>
+                <div className="soup-sway-layer relative flex items-center justify-center">
+                  <picture>
+                    <source srcSet={soupWebp} type="image/webp" />
+                    <img
+                      src={soupPng}
+                      alt="Sopa 3D do SoupMC"
+                      width={1024}
+                      height={682}
+                      decoding="async"
+                      fetchPriority="high"
+                      draggable={false}
+                      className="pointer-events-none h-auto w-[176px] select-none object-contain sm:w-[220px] lg:w-[248px]"
+                    />
+                  </picture>
 
-                {/* Subtle specular light sweep masked strictly to the soup silhouette */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 overflow-hidden"
-                  style={{
-                    WebkitMaskImage: `url(${soupPng})`,
-                    maskImage: `url(${soupPng})`,
-                    WebkitMaskSize: 'contain',
-                    maskSize: 'contain',
-                    WebkitMaskRepeat: 'no-repeat',
-                    maskRepeat: 'no-repeat',
-                    WebkitMaskPosition: 'center',
-                    maskPosition: 'center',
-                  }}
-                >
-                  <div className="soup-sheen-sweep" />
+                  {/* Subtle specular light sweep masked strictly to the soup silhouette */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 overflow-hidden"
+                    style={{
+                      WebkitMaskImage: `url(${soupPng})`,
+                      maskImage: `url(${soupPng})`,
+                      WebkitMaskSize: 'contain',
+                      maskSize: 'contain',
+                      WebkitMaskRepeat: 'no-repeat',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskPosition: 'center',
+                      maskPosition: 'center',
+                    }}
+                  >
+                    <div className="soup-sheen-sweep" />
+                  </div>
                 </div>
               </div>
             </motion.div>

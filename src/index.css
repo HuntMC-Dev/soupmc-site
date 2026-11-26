@@ -39,20 +39,24 @@ body {
   min-height: 100%;
 }
 
-/* Zero-flicker GPU-composited floating soup animation with subtle organic sway */
+/* Decoupled sinusoidal float + out-of-phase organic sway (zero mid-cycle pauses) */
 @keyframes soup-float {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) rotate(-1.3deg);
-  }
-  25% {
-    transform: translate3d(1.5px, calc(var(--soup-float-y) * 0.58), 0) rotate(1.6deg);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translate3d(0, var(--soup-float-y), 0) rotate(0.9deg);
+    transform: translate3d(0, var(--soup-float-y), 0);
   }
-  75% {
-    transform: translate3d(-1.5px, calc(var(--soup-float-y) * 0.42), 0) rotate(-1.8deg);
+}
+
+@keyframes soup-sway {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
   }
 }
 
@@ -69,14 +73,21 @@ body {
 }
 
 .soup-float-layer {
-  animation: soup-float 6.4s ease-in-out infinite;
+  animation: soup-float 5.4s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.soup-sway-layer {
+  animation: soup-sway 7.3s ease-in-out -1.9s infinite;
   will-change: transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
 .soup-shadow-layer {
-  animation: soup-shadow 6.4s ease-in-out infinite;
+  animation: soup-shadow 5.4s ease-in-out infinite;
   will-change: transform, opacity;
   backface-visibility: hidden;
 }
@@ -263,6 +274,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .soup-float-layer,
+  .soup-sway-layer,
   .soup-shadow-layer,
   .soup-sheen-sweep,
   .verdadeiro-highlight,
