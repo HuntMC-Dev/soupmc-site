@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import soupPng from '../assets/soup.png'
 import soupWebp from '../assets/soup.webp'
@@ -10,6 +10,16 @@ export function FloatingSoup() {
   const shouldReduceMotion = useReducedMotion()
   const [popKey, setPopKey] = useState(0)
   const splashRef = useRef<SoupSplashHandle>(null)
+
+  // Trigger recoil + liquid splash right as SoupHG begins appearing and rippling (950ms)
+  useEffect(() => {
+    if (shouldReduceMotion) return
+    const timer = window.setTimeout(() => {
+      setPopKey((prev) => prev + 1)
+      splashRef.current?.splash()
+    }, 950)
+    return () => window.clearTimeout(timer)
+  }, [shouldReduceMotion])
 
   const handleSoupClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (shouldReduceMotion) return
