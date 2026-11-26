@@ -14,8 +14,8 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
 
   return (
     <div className="flex w-full flex-col items-center">
-      {/* Hairline horizontal divider expanding from center at 4.15s */}
-      <div className="mt-5 flex h-[2px] w-full items-center justify-center sm:mt-6">
+      {/* Hairline horizontal divider with restrained warm glow expanding from center at 4.15s */}
+      <div className="relative mt-5 flex h-[10px] w-full items-center justify-center sm:mt-6">
         <motion.div
           aria-hidden="true"
           initial={
@@ -33,12 +33,25 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
               ? { duration: 0.25 }
               : { duration: 0.55, ease: EASE_CINEMATIC }
           }
-          className="h-[1px] w-[180px] origin-center sm:w-[220px]"
-          style={{
-            background:
-              'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent)',
-          }}
-        />
+          className="relative flex w-[200px] origin-center items-center justify-center sm:w-[250px]"
+        >
+          {/* Soft warm diffused halo */}
+          <span
+            className="pointer-events-none absolute inset-x-4 h-[6px] rounded-full blur-[5px]"
+            style={{
+              background:
+                'linear-gradient(90deg, transparent 0%, rgba(240, 176, 0, 0.22) 30%, rgba(255, 214, 102, 0.38) 50%, rgba(240, 176, 0, 0.22) 70%, transparent 100%)',
+            }}
+          />
+          {/* Crisp luminous core hairline */}
+          <span
+            className="relative h-[1px] w-full"
+            style={{
+              background:
+                'linear-gradient(90deg, transparent 0%, rgba(240, 176, 0, 0.32) 25%, rgba(255, 232, 166, 0.72) 50%, rgba(240, 176, 0, 0.32) 75%, transparent 100%)',
+            }}
+          />
+        </motion.div>
       </div>
 
       {/* Fixed min-height tagline stage -> zero layout shift */}
