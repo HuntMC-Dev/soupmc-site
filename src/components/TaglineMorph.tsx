@@ -175,7 +175,7 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
               </span>
             </span>
 
-            {/* Anchored " HG" stays 100% stationary — zero horizontal movement */}
+            {/* Anchored " HG" stays 100% stationary with zero horizontal movement */}
             <span className="inline-block whitespace-pre">{' HG'}</span>
           </motion.p>
         )}
