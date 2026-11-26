@@ -39,14 +39,20 @@ body {
   min-height: 100%;
 }
 
-/* Zero-flicker GPU-composited floating soup animation */
+/* Zero-flicker GPU-composited floating soup animation with subtle organic sway */
 @keyframes soup-float {
   0%,
   100% {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) rotate(-1.3deg);
+  }
+  25% {
+    transform: translate3d(1.5px, calc(var(--soup-float-y) * 0.58), 0) rotate(1.6deg);
   }
   50% {
-    transform: translate3d(0, var(--soup-float-y), 0);
+    transform: translate3d(0, var(--soup-float-y), 0) rotate(0.9deg);
+  }
+  75% {
+    transform: translate3d(-1.5px, calc(var(--soup-float-y) * 0.42), 0) rotate(-1.8deg);
   }
 }
 
@@ -63,14 +69,14 @@ body {
 }
 
 .soup-float-layer {
-  animation: soup-float 5.6s ease-in-out infinite;
+  animation: soup-float 6.4s ease-in-out infinite;
   will-change: transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
 .soup-shadow-layer {
-  animation: soup-shadow 5.6s ease-in-out infinite;
+  animation: soup-shadow 6.4s ease-in-out infinite;
   will-change: transform, opacity;
   backface-visibility: hidden;
 }
