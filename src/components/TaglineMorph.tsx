@@ -1,4 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { t } from '../i18n/store'
+import { Text } from '../i18n/Text'
 
 const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
@@ -11,6 +13,8 @@ interface TaglineMorphProps {
 
 export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
   const shouldReduceMotion = useReducedMotion()
+  const articleKey =
+    phase === 'true' ? 'tagline.true.article' : 'tagline.evolution.article'
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -54,7 +58,7 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
         </motion.div>
       </div>
 
-      {/* Fixed min-height tagline stage -> locked slot widths keep "A/O" and "HG" 100% stationary */}
+      {/* Fixed min-height tagline stage -> locked slot widths keep the article and "HG" 100% stationary */}
       <div className="mt-5 flex min-h-[3.2rem] items-center justify-center sm:mt-6 sm:min-h-[3.8rem]">
         {phase !== 'hidden' && (
           <motion.p
@@ -67,23 +71,23 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
             }
             className="inline-flex items-baseline justify-center text-center text-[clamp(1.35rem,5.2vw,1.75rem)] font-medium tracking-[-0.015em] text-[#dcdcdc] [text-shadow:0_2px_0_rgba(0,0,0,0.8),0_6px_16px_rgba(0,0,0,0.88)] sm:text-[1.95rem] lg:text-[2.2rem]"
           >
-            {/* Leading article: locked inline-grid slot (A -> O) */}
+            {/* Leading article: locked inline-grid slot sized for both phases */}
             <span className="relative inline-grid place-items-center">
               <span
                 aria-hidden="true"
                 className="pointer-events-none invisible col-start-1 row-start-1 select-none"
               >
-                O
+                <Text k="tagline.true.article" />
               </span>
               <span
                 aria-hidden="true"
                 className="pointer-events-none invisible col-start-1 row-start-1 select-none"
               >
-                A
+                <Text k="tagline.evolution.article" />
               </span>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
-                  key={phase === 'true' ? 'O' : 'A'}
+                  key={t(articleKey)}
                   initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={
@@ -98,26 +102,26 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
                   transition={{ duration: 0.26, ease: EASE_CINEMATIC }}
                   className="col-start-1 row-start-1 inline-block"
                 >
-                  {phase === 'true' ? 'O' : 'A'}
+                  <Text k={articleKey} />
                 </motion.span>
               </AnimatePresence>
             </span>
 
             <span>&nbsp;</span>
 
-            {/* Center slot: locked inline-grid width holds "evolução do" and "verdadeiro" so "HG" NEVER moves */}
+            {/* Center slot: locked inline-grid width holds both middle phrases (current language) so "HG" NEVER moves */}
             <span className="relative inline-grid place-items-center">
               <span
                 aria-hidden="true"
                 className="pointer-events-none invisible col-start-1 row-start-1 whitespace-nowrap select-none"
               >
-                evolução do
+                <Text k="tagline.evolution.middle" />
               </span>
               <span
                 aria-hidden="true"
                 className="pointer-events-none invisible col-start-1 row-start-1 pb-1 font-semibold whitespace-nowrap select-none"
               >
-                verdadeiro
+                <Text k="tagline.true.middle" />
               </span>
 
               <span className="col-start-1 row-start-1 inline-flex items-baseline justify-center whitespace-nowrap">
@@ -138,7 +142,7 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
                       }
                       className="inline-block text-[#e5e5e5]"
                     >
-                      evolução do
+                      <Text k="tagline.evolution.middle" />
                     </motion.span>
                   ) : (
                     <motion.span
@@ -152,7 +156,7 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
                       }
                       className="verdadeiro-highlight relative inline-block pb-1 font-semibold text-[#fafafa]"
                     >
-                      verdadeiro
+                      <Text k="tagline.true.middle" />
                       {/* Clean, sharp golden-to-ember underline drawing left-to-right */}
                       <motion.span
                         aria-hidden="true"
@@ -176,7 +180,7 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
             </span>
 
             {/* Anchored " HG" stays 100% stationary with zero horizontal movement */}
-            <span className="inline-block whitespace-pre">{' HG'}</span>
+            <Text k="tagline.suffix" className="inline-block whitespace-pre" />
           </motion.p>
         )}
       </div>

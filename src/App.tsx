@@ -7,6 +7,7 @@ import { TaglineMorph, type TaglinePhase } from './components/TaglineMorph'
 import { LaunchStatus } from './components/LaunchStatus'
 import { DiscordCta } from './components/DiscordCta'
 import { siteConfig } from './config/site'
+import { Text } from './i18n/Text'
 import huntmcLogoPng from './assets/huntmc-logo.png'
 import huntmcLogoWebp from './assets/huntmc-logo.webp'
 import soupPng from './assets/soup.png'
@@ -87,7 +88,7 @@ function HeroStage() {
                 className="h-5 w-auto select-none opacity-85 transition-[transform,opacity,filter] duration-200 ease-out group-hover:scale-110 group-hover:opacity-100 group-hover:brightness-125 sm:h-6"
               />
             </picture>
-            <span>Powered by HuntMC</span>
+            <Text k="footer.poweredBy" />
           </a>
         </div>
 
@@ -110,7 +111,7 @@ function HeroStage() {
               </picture>
               <span>{siteConfig.brandName}.</span>
             </span>
-            <span>Todos os direitos reservados.</span>
+            <Text k="footer.rights" />
           </p>
         </div>
 

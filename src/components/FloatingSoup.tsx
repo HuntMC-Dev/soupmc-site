@@ -3,6 +3,8 @@ import { motion, useReducedMotion } from 'motion/react'
 import soupPng from '../assets/soup.png'
 import soupWebp from '../assets/soup.webp'
 import { SoupSplashCanvas, type SoupSplashHandle } from './SoupSplashCanvas'
+import { t } from '../i18n/store'
+import { useI18nAttr } from '../i18n/Text'
 
 const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
@@ -10,6 +12,10 @@ export function FloatingSoup() {
   const shouldReduceMotion = useReducedMotion()
   const [popKey, setPopKey] = useState(0)
   const splashRef = useRef<SoupSplashHandle>(null)
+  const soupButtonRef = useRef<HTMLButtonElement>(null)
+  const soupImgRef = useRef<HTMLImageElement>(null)
+  useI18nAttr(soupButtonRef, 'aria-label', 'soup.alt')
+  useI18nAttr(soupImgRef, 'alt', 'soup.alt')
 
   // Trigger recoil + liquid splash right as the soup finishes appearing (650ms)
   useEffect(() => {
@@ -52,8 +58,9 @@ export function FloatingSoup() {
           {/* Layer 2: Pure GPU CSS hover lift + click spring pop */}
           <button
             type="button"
+            ref={soupButtonRef}
             onClick={handleSoupClick}
-            aria-label="Sopa 3D do SoupMC"
+            aria-label={t('soup.alt')}
             className="cursor-pointer border-0 bg-transparent p-0 outline-none will-change-transform [backface-visibility:hidden] [transform:translateZ(0)] transition-transform duration-200 ease-out hover:[transform:translateZ(0)_scale(1.045)] active:[transform:translateZ(0)_scale(0.96)] focus-visible:ring-2 focus-visible:ring-[#f0b000]/60 focus-visible:ring-offset-4 focus-visible:ring-offset-[#0f0f0f]"
           >
             <motion.div
@@ -73,8 +80,9 @@ export function FloatingSoup() {
                   <picture>
                     <source srcSet={soupWebp} type="image/webp" />
                     <img
+                      ref={soupImgRef}
                       src={soupPng}
-                      alt="Sopa 3D do SoupMC"
+                      alt={t('soup.alt')}
                       width={1024}
                       height={682}
                       decoding="async"

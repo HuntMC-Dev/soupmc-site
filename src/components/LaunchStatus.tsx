@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { siteConfig } from '../config/site'
+import { Text } from '../i18n/Text'
 
 const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
@@ -31,7 +32,7 @@ function pad2(value: number): string {
 
 export function LaunchStatus() {
   const shouldReduceMotion = useReducedMotion()
-  const { mode, label, targetDate } = siteConfig.launch
+  const { mode, targetDate } = siteConfig.launch
 
   const parsedTargetMs =
     mode === 'countdown' && targetDate ? Date.parse(targetDate) : Number.NaN
@@ -71,7 +72,7 @@ export function LaunchStatus() {
       {isValidCountdown ? (
         <p className="font-mono text-[clamp(1.5rem,4.8vw,2.4rem)] font-bold tracking-[0.16em] text-[#fafafa] uppercase tabular-nums [text-shadow:0_2px_0_rgba(0,0,0,0.75),0_6px_18px_rgba(0,0,0,0.9),0_0_28px_rgba(240,176,0,0.2)]">
           {countdown.completed ? (
-            'DISPONÍVEL AGORA'
+            <Text k="launch.availableNow" />
           ) : (
             <span className="inline-flex items-baseline gap-2 sm:gap-3">
               <span>{pad2(countdown.days)}d</span>
@@ -86,7 +87,7 @@ export function LaunchStatus() {
         </p>
       ) : (
         <p className="font-display pl-[0.24em] text-[clamp(1.65rem,5vw,2.6rem)] font-bold tracking-[0.24em] text-[#fafafa] uppercase [text-shadow:0_2px_0_rgba(0,0,0,0.75),0_6px_18px_rgba(0,0,0,0.9),0_0_28px_rgba(240,176,0,0.22)]">
-          {label}
+          <Text k="launch.comingSoon" />
         </p>
       )}
     </motion.div>

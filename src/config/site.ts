@@ -4,10 +4,9 @@ export interface SiteConfig {
   brandName: string
   launch: {
     mode: LaunchMode
-    label: string
     /**
      * ISO 8601 date string (e.g. '2026-12-20T18:00:00-03:00').
-     * To switch from "Em breve" to a live countdown, set mode to 'countdown'
+     * To switch from "coming soon" (text in src/i18n/messages.ts) to a live countdown, set mode to 'countdown'
      * and provide a valid future targetDate.
      */
     targetDate: string | null
@@ -26,7 +25,6 @@ export const siteConfig: SiteConfig = {
   brandName: 'SoupMC',
   launch: {
     mode: 'coming_soon',
-    label: 'Em breve',
     targetDate: null,
   },
   discordUrl: 'https://discord.soupmc.com',
