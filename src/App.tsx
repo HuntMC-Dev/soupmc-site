@@ -6,6 +6,7 @@ import { BrandWordmark } from './components/BrandWordmark'
 import { TaglineMorph, type TaglinePhase } from './components/TaglineMorph'
 import { LaunchStatus } from './components/LaunchStatus'
 import { DiscordCta } from './components/DiscordCta'
+import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { siteConfig } from './config/site'
 import { Text } from './i18n/Text'
 import huntmcLogoPng from './assets/huntmc-logo.png'
@@ -56,6 +57,7 @@ function HeroStage() {
   return (
     <div className="relative flex min-h-[100dvh] w-full flex-col overflow-hidden bg-[var(--bg)] text-[var(--text)]">
       <AtmosphericBackground />
+      <LanguageSwitcher />
 
       <main className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-10">
         <FloatingSoup />

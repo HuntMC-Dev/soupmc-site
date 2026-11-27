@@ -1,10 +1,21 @@
+import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { t } from '../i18n/store'
+import { subscribe, t } from '../i18n/store'
 import { Text } from '../i18n/Text'
 
 const EASE_CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
 
 export type TaglinePhase = 'hidden' | 'evolution' | 'true'
+
+/** Wait for the final phrase (and its underline) to land before resizing. */
+const SETTLE_DELAY_MS = 900
+/**
+ * The center slot is locked to the wider phrase so "HG" stays still during the
+ * swap. When the final phrase is much narrower (some languages), that lock
+ * would leave visible gaps, so after the swap the slot is released and the
+ * article and "HG" glide in.
+ */
+const SHRINK_RATIO = 0.15
 
 interface TaglineMorphProps {
   showDivider: boolean
@@ -15,6 +26,52 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
   const shouldReduceMotion = useReducedMotion()
   const articleKey =
     phase === 'true' ? 'tagline.true.article' : 'tagline.evolution.article'
+  const articleSlotRef = useRef<HTMLSpanElement>(null)
+  const suffixRef = useRef<HTMLSpanElement>(null)
+  const evolutionGhostRef = useRef<HTMLSpanElement>(null)
+  const trueGhostRef = useRef<HTMLSpanElement>(null)
+
+  // Direct DOM (FLIP) on purpose: it also has to follow in-place language
+  // swaps, which never re-render this component.
+  useEffect(() => {
+    if (phase !== 'true') return
+
+    const fitSlot = () => {
+      const evolutionGhost = evolutionGhostRef.current
+      const trueGhost = trueGhostRef.current
+      if (!evolutionGhost || !trueGhost) return
+      const movers = [articleSlotRef.current, suffixRef.current].filter(
+        (el): el is HTMLSpanElement => el !== null,
+      )
+      const before = movers.map((el) => el.getBoundingClientRect().left)
+
+      evolutionGhost.style.display = ''
+      const evolutionWidth = evolutionGhost.getBoundingClientRect().width
+      const trueWidth = trueGhost.getBoundingClientRect().width
+      evolutionGhost.style.display =
+        evolutionWidth - trueWidth > trueWidth * SHRINK_RATIO ? 'none' : ''
+
+      if (shouldReduceMotion) return
+      movers.forEach((el, i) => {
+        const dx = before[i] - el.getBoundingClientRect().left
+        if (Math.abs(dx) < 0.5) return
+        el.animate(
+          [{ transform: `translateX(${dx}px)` }, { transform: 'translateX(0)' }],
+          { duration: 520, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+        )
+      })
+    }
+
+    const timer = window.setTimeout(
+      fitSlot,
+      shouldReduceMotion ? 0 : SETTLE_DELAY_MS,
+    )
+    const unsubscribe = subscribe(fitSlot)
+    return () => {
+      window.clearTimeout(timer)
+      unsubscribe()
+    }
+  }, [phase, shouldReduceMotion])
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -72,7 +129,10 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
             className="inline-flex items-baseline justify-center text-center text-[clamp(1.35rem,5.2vw,1.75rem)] font-medium tracking-[-0.015em] text-[#dcdcdc] [text-shadow:0_2px_0_rgba(0,0,0,0.8),0_6px_16px_rgba(0,0,0,0.88)] sm:text-[1.95rem] lg:text-[2.2rem]"
           >
             {/* Leading article: locked inline-grid slot sized for both phases */}
-            <span className="relative inline-grid place-items-center">
+            <span
+              ref={articleSlotRef}
+              className="relative inline-grid place-items-center"
+            >
               <span
                 aria-hidden="true"
                 className="pointer-events-none invisible col-start-1 row-start-1 select-none"
@@ -112,12 +172,14 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
             {/* Center slot: locked inline-grid width holds both middle phrases (current language) so "HG" NEVER moves */}
             <span className="relative inline-grid place-items-center">
               <span
+                ref={evolutionGhostRef}
                 aria-hidden="true"
                 className="pointer-events-none invisible col-start-1 row-start-1 whitespace-nowrap select-none"
               >
                 <Text k="tagline.evolution.middle" />
               </span>
               <span
+                ref={trueGhostRef}
                 aria-hidden="true"
                 className="pointer-events-none invisible col-start-1 row-start-1 pb-1 font-semibold whitespace-nowrap select-none"
               >
@@ -180,7 +242,9 @@ export function TaglineMorph({ showDivider, phase }: TaglineMorphProps) {
             </span>
 
             {/* Anchored " HG" stays 100% stationary with zero horizontal movement */}
-            <Text k="tagline.suffix" className="inline-block whitespace-pre" />
+            <span ref={suffixRef} className="inline-block whitespace-pre">
+              <Text k="tagline.suffix" />
+            </span>
           </motion.p>
         )}
       </div>

@@ -12,12 +12,15 @@ import {
  * Language store that lives OUTSIDE React on purpose.
  *
  * Flow:
- *  1. Before the first render the language comes from `?lang=`, then from a
- *     country cached on a previous visit, then from the browser languages.
+ *  1. Before the first render the language comes from `?lang=`, then from the
+ *     visitor's own pick in the language switcher, then from a country cached
+ *     on a previous visit, then from the browser languages.
  *  2. The country lookup (public geo-IP pool) runs in the background. When it
  *     answers, the language may change: subscribers write the new strings
  *     straight into their DOM nodes. No React state changes, so no component
  *     re-renders, remounts or replays its entrance animation.
+ *  3. A pick in the language switcher is saved and always wins over the
+ *     country, including a lookup that answers after the pick.
  *
  * Country rule (same as the game servers): Brazil and the other Portuguese
  * speaking countries -> pt, Spanish speaking countries -> es. Any other
@@ -33,6 +36,7 @@ const SPANISH_COUNTRIES = new Set([
 
 const COUNTRY_CACHE_KEY = 'soupmc.geo.country'
 const COUNTRY_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
+const CHOSEN_LANG_KEY = 'soupmc.lang'
 
 type Listener = (lang: Lang) => void
 
@@ -66,6 +70,15 @@ function queryLang(): Lang | null {
   return isLang(value) ? value : null
 }
 
+function readChosenLang(): Lang | null {
+  try {
+    const value = window.localStorage.getItem(CHOSEN_LANG_KEY)
+    return isLang(value) ? value : null
+  } catch {
+    return null
+  }
+}
+
 function readCachedCountry(): string | null {
   try {
     const raw = window.localStorage.getItem(COUNTRY_CACHE_KEY)
@@ -91,9 +104,11 @@ function writeCachedCountry(country: string) {
 }
 
 const forcedLang = queryLang()
-const cachedCountry = forcedLang ? null : readCachedCountry()
+let chosenLang: Lang | null = forcedLang ? null : readChosenLang()
+const cachedCountry = forcedLang || chosenLang ? null : readCachedCountry()
 
-let current: Lang = forcedLang ?? langForCountry(cachedCountry) ?? browserLang()
+let current: Lang =
+  forcedLang ?? chosenLang ?? langForCountry(cachedCountry) ?? browserLang()
 const listeners = new Set<Listener>()
 
 export function getLang(): Lang {
@@ -133,16 +148,34 @@ function setLang(lang: Lang) {
   for (const listener of listeners) listener(lang)
 }
 
+/** Language switcher pick: saved, and wins over any country lookup. */
+export function chooseLang(lang: Lang) {
+  chosenLang = lang
+  try {
+    window.localStorage.setItem(CHOSEN_LANG_KEY, lang)
+  } catch {
+    // Storage blocked: the pick still applies for this visit.
+  }
+  // Drop ?lang= so a reload keeps the pick instead of the link's language.
+  const url = new URL(window.location.href)
+  if (url.searchParams.has('lang')) {
+    url.searchParams.delete('lang')
+    window.history.replaceState(window.history.state, '', url)
+  }
+  setLang(lang)
+}
+
 /** Call once before the first render. */
 export function initI18n() {
   applyDocument(current)
-  // Explicit ?lang= wins, and a fresh cached country already decided the language.
-  if (forcedLang || cachedCountry) return
+  // ?lang=, a saved pick or a fresh cached country already decided the language.
+  if (forcedLang || chosenLang || cachedCountry) return
 
   void detectCountry().then((country) => {
     if (!country) return
     writeCachedCountry(country)
     const lang = langForCountry(country)
-    if (lang) setLang(lang)
+    // The visitor may have picked a language while the lookup was running.
+    if (lang && !chosenLang) setLang(lang)
   })
 }

@@ -8,6 +8,13 @@ export const HTML_LANG: Record<Lang, string> = {
   en: 'en',
 }
 
+/** Native name shown in the language switcher (never translated). */
+export const LANG_NAME: Record<Lang, string> = {
+  pt: 'Português',
+  es: 'Español',
+  en: 'English',
+}
+
 export const OG_LOCALE: Record<Lang, string> = {
   pt: 'pt_BR',
   es: 'es_LA',
@@ -30,6 +37,7 @@ const pt = {
   'soup.alt': 'Sopa 3D do SoupMC',
   'footer.poweredBy': 'Powered by HuntMC',
   'footer.rights': 'Todos os direitos reservados.',
+  'lang.switcher': 'Idioma',
 }
 
 export type MessageKey = keyof typeof pt
@@ -50,17 +58,18 @@ const es: Record<MessageKey, string> = {
   'soup.alt': 'Sopa 3D de SoupMC',
   'footer.poweredBy': 'Powered by HuntMC',
   'footer.rights': 'Todos los derechos reservados.',
+  'lang.switcher': 'Idioma',
 }
 
 const en: Record<MessageKey, string> = {
-  'meta.title': 'SoupMC - The true HG',
+  'meta.title': 'SoupMC - The one and only HG',
   'meta.description':
-    'SoupMC - The evolution of HG. The true HG is coming. Coming soon.',
-  'meta.ogDescription': 'The true HG is coming. Coming soon.',
+    'SoupMC - The evolution of HG. The one and only HG is coming. Coming soon.',
+  'meta.ogDescription': 'The one and only HG is coming. Coming soon.',
   'tagline.evolution.article': 'The',
   'tagline.evolution.middle': 'evolution of',
   'tagline.true.article': 'The',
-  'tagline.true.middle': 'true',
+  'tagline.true.middle': 'one and only',
   'tagline.suffix': ' HG',
   'launch.comingSoon': 'Coming soon',
   'launch.availableNow': 'Available now',
@@ -68,6 +77,7 @@ const en: Record<MessageKey, string> = {
   'soup.alt': 'SoupMC 3D soup',
   'footer.poweredBy': 'Powered by HuntMC',
   'footer.rights': 'All rights reserved.',
+  'lang.switcher': 'Language',
 }
 
 export const MESSAGES: Record<Lang, Record<MessageKey, string>> = { pt, es, en }
